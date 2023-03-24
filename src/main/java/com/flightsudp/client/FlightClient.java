@@ -11,6 +11,9 @@ public class FlightClient {
             System.exit(1);
         }
 
+        // TODO: SONGYUN include semantics flag in command line args (at-most-once, at-least-once)
+        // TODO: SONGYUN simulate packet loss
+
         // Parse command line arguments
         String serverAddress = args[0];
         int portNumber = Integer.parseInt(args[1]);
@@ -31,28 +34,38 @@ public class FlightClient {
             System.out.print("Enter input: ");
             String input = reader.readLine();
 
-            // Process input using FlightClientController object
+            if (input == "quit") {
+                break;
+            }
+
             try {
-                byte[] processedInput = controller.processInput(input);
-                // Convert processed input to bytes and send packet to server
-                DatagramPacket sendPacket = new DatagramPacket(processedInput, processedInput.length, serverInetAddress, portNumber);
+                // Process input using FlightClientController object and send packet to server
+                String processedInput = controller.processInput(input);
+                sendData = processedInput.getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverInetAddress, portNumber);
                 socket.send(sendPacket);
+
+                //TODO: SONGYUN timeout on response
 
                 // Receive response packet and process response using FlightClientController object
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 socket.receive(receivePacket);
-                
                 try {
                     String processedResponse = controller.processResponse(receivePacket);
                     // Display processed response
+                    // TODO: SONGYUN prettify response display
                     System.out.println("Response: " + processedResponse);
+
                 } catch (Exception e) {
                     System.out.println(e);
                 }
+
             } catch (Exception e){
-                //TODO: handle exception
                 System.out.println(e);
             }
         }
+
+        System.out.println("Exiting...");
+        socket.close();
     }
 }

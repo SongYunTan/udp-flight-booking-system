@@ -1,7 +1,5 @@
 package com.flightsudp;
 
-import org.json.JSONObject;
-import java.io.*;
 import java.net.InetAddress;
 
 /**
@@ -16,7 +14,7 @@ public class App
             InetAddress local = InetAddress.getLocalHost();
             System.out.println(local);
         } catch (Exception e) {
-            //TODO: handle error
+            //handle error
         }
     }
 }

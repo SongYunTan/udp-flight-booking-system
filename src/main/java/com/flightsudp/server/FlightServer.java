@@ -32,6 +32,10 @@ public class FlightServer {
             socket.receive(receivePacket);
             String input = new String(receivePacket.getData()).trim();
 
+            if (input == "shutdown") {
+                break;
+            }
+
             // Process input using FlightServerController object
             try {
                 String response = controller.processInput(input);
@@ -43,11 +47,12 @@ public class FlightServer {
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
                 socket.send(sendPacket);
             } catch (Exception e) {
-                // TODO: handle exception
+                System.err.println(e);
             }
         }
 
-        // socket.close();
+        System.out.println("Server exiting....");
+        socket.close();
     }
 }
 

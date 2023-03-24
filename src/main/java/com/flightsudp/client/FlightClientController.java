@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import java.net.DatagramPacket;
 
 public class FlightClientController {
-    public byte[] processInput(String input) throws Exception {
+    public String processInput(String input) throws Exception {
         // Parse input to determine server side function to be invoked and necessary parameters
         String[] tokens = input.split(" ");
         String functionName = tokens[0];
@@ -20,15 +20,18 @@ public class FlightClientController {
             params.put(paramName, paramValue);
         }
 
+        // TODO: SONGYUN uuid in packet
+        // TODO: SONGYUN additional error handling
+
         // Construct request JSON with function name and parameters
         JSONObject requestJson = new JSONObject();
         requestJson.put("function", functionName);
         requestJson.put("data", params);
 
         // Convert request JSON to byte array
-        byte[] requestData = requestJson.toString().getBytes();
+        String processedInput = requestJson.toString();
 
-        return requestData;
+        return processedInput;
     }
 
     public String processResponse(DatagramPacket responsePacket) throws Exception {

@@ -12,8 +12,9 @@ public class FlightServerController {
         serviceMap = new HashMap<>();
         // Add FlightService implementations to the service map
         serviceMap.put("listFlights", new ListFlightsService());
-        // serviceMap.put("bookFlight", new BookFlightService());
-        // Add additional services as necessary
+        // TODO: XINRUI Add additional services as necessary
+        // TODO: XINRUI make pubsub
+        // TODO: XINRUI make dummy data + loader into memory
     }
 
     public String processInput(String input) throws Exception {
@@ -47,4 +48,7 @@ public class FlightServerController {
 
         return responseJson.toString();
     }
+
+    // TODO: DUANKAI handle duplicate req messages (at-least-once semantics) via histories
+    // TODO: DUANKAI handle monitoring
 }
