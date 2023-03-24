@@ -1,3 +1,5 @@
+package com.flightsudp.server;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -10,7 +12,7 @@ public class FlightServerController {
         serviceMap = new HashMap<>();
         // Add FlightService implementations to the service map
         serviceMap.put("listFlights", new ListFlightsService());
-        serviceMap.put("bookFlight", new BookFlightService());
+        // serviceMap.put("bookFlight", new BookFlightService());
         // Add additional services as necessary
     }
 

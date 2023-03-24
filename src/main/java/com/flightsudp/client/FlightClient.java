@@ -18,8 +18,8 @@ public class FlightClient {
         // Create socket and packet for sending and receiving data
         DatagramSocket socket = new DatagramSocket();
         InetAddress serverInetAddress = InetAddress.getByName(serverAddress);
-        byte[] sendData = new byte[65535];
-        byte[] receiveData = new byte[65535];
+        byte[] sendData = new byte[1024];
+        byte[] receiveData = new byte[1024];
 
         // Create FlightClientController object for processing input and responses
         FlightClientController controller = new FlightClientController();
@@ -32,22 +32,27 @@ public class FlightClient {
             String input = reader.readLine();
 
             // Process input using FlightClientController object
-            Byte[] processedInput = controller.processInput(input);
-            
-            UUID uuid = 
+            try {
+                byte[] processedInput = controller.processInput(input);
+                // Convert processed input to bytes and send packet to server
+                DatagramPacket sendPacket = new DatagramPacket(processedInput, processedInput.length, serverInetAddress, portNumber);
+                socket.send(sendPacket);
 
-            // Convert processed input to bytes and send packet to server
-            DatagramPacket sendPacket = new DatagramPacket(processedInput, processedInput.length, serverInetAddress, portNumber);
-            socket.send(sendPacket);
-
-            // Receive response packet and process response using FlightClientController object
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            socket.receive(receivePacket);
-            String response = new String(receivePacket.getData());
-            String processedResponse = controller.processResponse(response);
-
-            // Display processed response
-            System.out.println("Response: " + processedResponse);
+                // Receive response packet and process response using FlightClientController object
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                socket.receive(receivePacket);
+                
+                try {
+                    String processedResponse = controller.processResponse(receivePacket);
+                    // Display processed response
+                    System.out.println("Response: " + processedResponse);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            } catch (Exception e){
+                //TODO: handle exception
+                System.out.println(e);
+            }
         }
     }
 }

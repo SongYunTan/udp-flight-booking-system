@@ -1,3 +1,5 @@
+package com.flightsudp.server;
+
 public class Flight {
     private String flightNumber;
     private String source;
@@ -46,10 +48,10 @@ public class Flight {
     }
 
     public int getSeats() {
-        return price;
+        return seats;
     }
 
-    public void setSeats(int price) {
-        this.price = price;
+    public void setSeats(int seats) {
+        this.seats = seats;
     }
 }

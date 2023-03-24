@@ -1,3 +1,5 @@
+package com.flightsudp.server;
+
 import org.json.JSONObject;
 
 public interface FlightService {

@@ -1,3 +1,5 @@
+package com.flightsudp.server;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

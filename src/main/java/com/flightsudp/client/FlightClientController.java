@@ -3,16 +3,16 @@ package com.flightsudp.client;
 import org.json.JSONObject;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class FlightClientController {
-    private static final int PACKET_SIZE = 1024;
-
     public byte[] processInput(String input) throws Exception {
         // Parse input to determine server side function to be invoked and necessary parameters
         String[] tokens = input.split(" ");
         String functionName = tokens[0];
+        
+        if (tokens.length % 2 != 1) {
+            throw new Exception("Input should be <function> <parameter name> <parameter value>");
+        }
         JSONObject params = new JSONObject();
         for (int i = 1; i < tokens.length; i += 2) {
             String paramName = tokens[i];
@@ -23,7 +23,7 @@ public class FlightClientController {
         // Construct request JSON with function name and parameters
         JSONObject requestJson = new JSONObject();
         requestJson.put("function", functionName);
-        requestJson.put("params", params);
+        requestJson.put("data", params);
 
         // Convert request JSON to byte array
         byte[] requestData = requestJson.toString().getBytes();

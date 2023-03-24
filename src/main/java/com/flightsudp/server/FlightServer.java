@@ -1,4 +1,4 @@
-// package com.flightsudp.server;
+package com.flightsudp.server;
 
 import java.net.*;
 import java.io.*;
@@ -16,6 +16,9 @@ public class FlightServer {
 
         // Create socket and packet for receiving and sending data
         DatagramSocket socket = new DatagramSocket(portNumber);
+        
+        System.out.println("Server started at port " + args[0]);
+        
         byte[] receiveData = new byte[1024];
         byte[] sendData = new byte[1024];
 
@@ -30,14 +33,18 @@ public class FlightServer {
             String input = new String(receivePacket.getData()).trim();
 
             // Process input using FlightServerController object
-            String response = controller.processInput(input);
+            try {
+                String response = controller.processInput(input);
 
-            // Convert response to bytes and send response packet back to client
-            InetAddress clientAddress = receivePacket.getAddress();
-            int clientPort = receivePacket.getPort();
-            sendData = response.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
-            socket.send(sendPacket);
+                // Convert response to bytes and send response packet back to client
+                InetAddress clientAddress = receivePacket.getAddress();
+                int clientPort = receivePacket.getPort();
+                sendData = response.getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
+                socket.send(sendPacket);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
         }
 
         // socket.close();
