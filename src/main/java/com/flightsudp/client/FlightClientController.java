@@ -5,16 +5,11 @@ import java.net.DatagramPacket;
 import java.util.UUID;
 
 public class FlightClientController {
-    public byte[] generateRequest(String functionName, JSONObject params, FlightClient.Semantics semantics, Boolean packetLoss) throws Exception {
+    public byte[] generateRequest(JSONObject requestJson) {
         UUID uuid = UUID.randomUUID();
 
         // Construct request JSON with function name and parameters
-        JSONObject requestJson = new JSONObject();
         requestJson.put("uuid", uuid);
-        requestJson.put("semantics", semantics);
-        requestJson.put("packetLoss", packetLoss);
-        requestJson.put("function", functionName);
-        requestJson.put("data", params);
 
         // Convert request JSON to byte array
         return requestJson.toString().getBytes();

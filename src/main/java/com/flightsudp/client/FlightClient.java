@@ -3,7 +3,6 @@ package com.flightsudp.client;
 import java.io.*;
 import java.net.*;
 import java.util.Objects;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,21 +25,44 @@ public class FlightClient {
         int serverPortNumber = Integer.parseInt(args[1]);
 
         // Loop to read input, send packet, receive response, and process and display response
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
         while (true) {
+            JSONObject userInput = getUserInput();
+            // Create FlightClientController object for processing request and response
+            FlightClientController controller = new FlightClientController();
+            // Generate request bytes using FlightClientController object
+            byte[] requestBytes = controller.generateRequest(userInput);
+            // Send packet to server
+            DatagramPacket responsePacket = sendAndReceiveDatagramPacket(serverAddress, serverPortNumber, requestBytes, userInput.getString("semantics"));
+            // Process response using FlightClientController object
+            JSONObject processedResponse = null;
+            try {
+                processedResponse = controller.processResponse(responsePacket);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            System.out.println("=".repeat(20) + "\nDisplaying Results\n");
+            displayResults(processedResponse, 0);
+        }
+    }
+
+    public static JSONObject getUserInput() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        int choice = 0;
+        JSONObject params = new JSONObject();
+        JSONObject userInput = new JSONObject();
+
+        while (choice<=0 || choice>=9) {
             // Read input from user
-            System.out.println("1: Find flight by source and destination\n2: Find flight by flightID\n" +
-                    "3: Reserve Flight\n4: Monitor Flight\n5: Get Cheaper Flights\n" +
+            System.out.println("=".repeat(40) + "\n1: Find flight by source and destination\n" +
+                    "2: Find flight by flightID\n3: Reserve Flight\n4: Monitor Flight\n5: Get Cheaper Flights\n" +
                     "6: Cancel Flight\n7: Quit");
             System.out.print("Enter your choice: ");
-            int choice = Integer.parseInt(reader.readLine());
-
-            String functionName = "";
-            JSONObject params = new JSONObject();
+            choice = Integer.parseInt(reader.readLine());
 
             switch (choice) {
                 case 1: {
-                    functionName = "flightids";
+                    userInput.put("function", "flightids");
                     System.out.print("Enter source: ");
                     params.put("source", reader.readLine());
                     System.out.print("Enter destination: ");
@@ -48,13 +70,13 @@ public class FlightClient {
                     break;
                 }
                 case 2: {
-                    functionName = "flightdetails";
+                    userInput.put("function", "flightdetails");
                     System.out.print("Enter flight ID: ");
                     params.put("flightid", reader.readLine());
                     break;
                 }
                 case 3: {
-                    functionName = "flightreservation";
+                    userInput.put("function", "flightreservation");
                     System.out.print("Enter flight ID: ");
                     params.put("flightid", reader.readLine());
                     System.out.print("Enter number of seats to reserve: ");
@@ -62,7 +84,7 @@ public class FlightClient {
                     break;
                 }
                 case 4: {
-                    functionName = "monitorupdates";
+                    userInput.put("function", "monitorupdates");
                     System.out.print("Enter flight ID: ");
                     params.put("flightid", reader.readLine());
                     System.out.print("Enter monitor duration: ");
@@ -70,13 +92,13 @@ public class FlightClient {
                     break;
                 }
                 case 5: {
-                    functionName = "getcheaper";
+                    userInput.put("function", "getcheaper");
                     System.out.print("Enter airfare: ");
                     params.put("airfare", reader.readLine());
                     break;
                 }
                 case 6: {
-                    functionName = "flightcancellation";
+                    userInput.put("function", "flightcancellation");
                     System.out.print("Enter flight ID: ");
                     params.put("flightid", reader.readLine());
                     System.out.print("Enter number of seats to cancel: ");
@@ -85,47 +107,79 @@ public class FlightClient {
                 }
                 case 7: {
                     System.out.println("Exiting...");
-                    break;
+                    System.exit(0);
                 }
                 case 8: {
-                    functionName= "listFlights";
+                    userInput.put("function", "listFlights");
                     break;
                 }
                 default: {
                     System.out.println("Invalid number, please try again...");
-                    continue;
+                }
+            }
+        }
+
+        userInput.put("data", params);
+
+        System.out.print("=".repeat(20) + "\n1: at-least-once\n2: at-most-once\nEnter invocation semantics: ");
+        if (Objects.equals(reader.readLine(), "1")) {
+            userInput.put("semantics", "AT-LEAST-ONCE");
+        } else {
+            userInput.put("semantics", "AT-MOST-ONCE");
+        }
+
+        System.out.print("Simulate packet loss? Enter Y/N: ");
+        if (Objects.equals(reader.readLine(), "Y")) {
+            userInput.put("packetLoss", Boolean.TRUE);
+        } else {
+            userInput.put("packetLoss", Boolean.FALSE);
+        }
+        System.out.println("=".repeat(20));
+        return userInput;
+    }
+
+    public static DatagramPacket sendAndReceiveDatagramPacket(String serverAddress, int serverPortNumber, byte[] requestBytes, String semantics) throws SocketException, UnknownHostException {
+        // Create socket and packet for sending and receiving data
+        DatagramSocket socket = new DatagramSocket();
+        InetAddress serverInetAddress = InetAddress.getByName(serverAddress);
+        byte[] responseBytes = new byte[1024];
+        DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);;
+
+        try {
+            DatagramPacket requestPacket = new DatagramPacket(requestBytes, requestBytes.length, serverInetAddress, serverPortNumber);
+            socket.send(requestPacket);
+
+            System.out.println("Sending packet");
+
+            socket.setSoTimeout(5000);
+
+            // Receive response packet
+            // If no response received within 5s and semantics is at-least-once, resend packet
+            while(true) {
+                try {
+                    socket.receive(responsePacket);
+                    break;
+                } catch (SocketTimeoutException e) {
+                    if (semantics == "AT-LEAST-ONCE") {
+                        // Resend request packet after timeout
+                        socket.send(requestPacket);
+                        System.out.println("Sending packet");
+                    } else {
+                        System.out.println("No response received from server");
+                        return null;
+                    }
                 }
             }
 
-            if (choice == 7) {
-                break;
-            }
-
-            Semantics semantics;
-            System.out.print("1: at-least-once\n2: at-most-once\nEnter invocation semantics: ");
-            if (Objects.equals(reader.readLine(), "1")) {
-                semantics = Semantics.AT_LEAST_ONCE;
-            } else {
-                semantics = Semantics.AT_MOST_ONCE;
-            }
-
-
-            Boolean packetLoss;
-            System.out.print("Simulate packet loss? Enter Y/N: ");
-            if (Objects.equals(reader.readLine(), "Y")) {
-                packetLoss = Boolean.TRUE;
-            } else {
-                packetLoss = Boolean.FALSE;
-            }
-
-            JSONObject processedResponse = sendAndReceiveDatagramPacket(serverAddress, serverPortNumber, functionName, params, semantics, packetLoss);
-            // Display processed response
-            printJsonObject(processedResponse, 0);
-            // System.out.println("Response: " + processedResponse);
+        } catch (Exception e) {
+            System.out.println(e);
         }
+
+        socket.close();
+        return responsePacket;
     }
 
-    public static void printJsonObject(JSONObject jsonObj, int nest) {
+    public static void displayResults(JSONObject jsonObj, int nest) {
         for (String key : jsonObj.keySet()) {
             System.out.println(" ".repeat(2*(nest)) + key);
 
@@ -148,66 +202,10 @@ public class FlightClient {
             //for nested objects iteration if required
             else if (jsonObj.get(key) instanceof JSONObject) {
                 JSONObject value = jsonObj.getJSONObject(key);
-                printJsonObject(value, nest + 1);
+                displayResults(value, nest + 1);
             }
             else
                 System.out.println(" ".repeat(2*(nest+1)) + jsonObj.get(key));
         }
-    }
-
-    public static JSONObject sendAndReceiveDatagramPacket(String serverAddress, int serverPortNumber, String functionName, JSONObject params, Semantics semantics, Boolean packetLoss) throws SocketException, UnknownHostException {
-        // Create socket and packet for sending and receiving data
-        DatagramSocket socket = new DatagramSocket();
-        InetAddress serverInetAddress = InetAddress.getByName(serverAddress);
-        byte[] requestBytes = new byte[1024];
-        byte[] responseBytes = new byte[1024];
-
-        // Create FlightClientController object for processing request and response
-        FlightClientController controller = new FlightClientController();
-        JSONObject processedResponse = null;
-
-        try {
-            // Generate request bytes using FlightClientController object and send packet to server
-            requestBytes = controller.generateRequest(functionName, params, semantics, packetLoss);
-            DatagramPacket requestPacket = new DatagramPacket(requestBytes, requestBytes.length, serverInetAddress, serverPortNumber);
-            socket.send(requestPacket);
-
-            System.out.println("Sending packet");
-
-            socket.setSoTimeout(5000);
-
-            // Receive response packet
-            DatagramPacket responsePacket;
-
-            while(true) {
-                responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
-                try {
-                    socket.receive(responsePacket);
-                    break;
-                } catch (SocketTimeoutException e) {
-                    if (semantics == Semantics.AT_LEAST_ONCE) {
-                        // Resend request packet after timeout
-                        socket.send(requestPacket);
-                        System.out.println("Sending packet");
-                    } else {
-                        System.out.println("No response received from server");
-                        return null;
-                    }
-                }
-            }
-
-            // Process response using FlightClientController object
-            try {
-                processedResponse = controller.processResponse(responsePacket);
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        socket.close();
-        return processedResponse;
     }
 }
