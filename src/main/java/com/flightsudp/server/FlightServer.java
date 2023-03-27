@@ -36,13 +36,12 @@ public class FlightServer {
                 break;
             }
 
-            // Process input using FlightServerController object
             try {
-                String response = controller.processInput(input);
+                InetAddress clientAddress = receivePacket.getAddress();
+                Integer clientPort = receivePacket.getPort();
+                String response = controller.processInput(input, clientAddress, clientPort);
 
                 // Convert response to bytes and send response packet back to client
-                InetAddress clientAddress = receivePacket.getAddress();
-                int clientPort = receivePacket.getPort();
                 sendData = response.getBytes();
                 DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
                 socket.send(sendPacket);
