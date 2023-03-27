@@ -36,9 +36,10 @@ public class FlightServer {
                 break;
             }
 
-            // Process input using FlightServerController object
             try {
+                // Process input using FlightServerController object
                 String response = controller.processInput(input);
+                // If packetLossServerToClient simulated, exception will be thrown and packet will not be sent
 
                 // Convert response to bytes and send response packet back to client
                 InetAddress clientAddress = receivePacket.getAddress();

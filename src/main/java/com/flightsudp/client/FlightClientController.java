@@ -5,13 +5,17 @@ import java.net.DatagramPacket;
 import java.util.UUID;
 
 public class FlightClientController {
-    public byte[] generateRequest(JSONObject requestJson) {
+
+    public JSONObject obtainUUID(JSONObject requestJson) {
         UUID uuid = UUID.randomUUID();
         String UUIDString = uuid.toString();
 
         // Construct request JSON with function name and parameters
         requestJson.put("uuid", UUIDString);
+        return requestJson;
+    }
 
+    public byte[] generateRequest(JSONObject requestJson) {
         // Convert request JSON to byte array
         return requestJson.toString().getBytes();
     }

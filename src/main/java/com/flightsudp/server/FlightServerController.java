@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FlightServerController {
@@ -24,15 +25,27 @@ public class FlightServerController {
     public String processInput(String input) throws Exception {
         // Parse request JSON from input data
         JSONObject requestJson = new JSONObject(input);
+
+        Boolean packetLossClientToServer = requestJson.getBoolean("packetLossClientToServer");
+        if (packetLossClientToServer)
+            throw new Exception("Packet Loss From Client To Server");
+
         String functionName = requestJson.getString("function");
         JSONObject params = requestJson.getJSONObject("data");
+        String semantics = requestJson.getString("semantics");
 
-        // Check against seenMap
         String str_uuid = requestJson.getString("uuid");
         UUID uuid = UUID.fromString(str_uuid);
-        String cachedResponse = seenMap.get(uuid);
-        if (cachedResponse != null) {
-            return cachedResponse;
+
+        if (Objects.equals(semantics, "AT-MOST-ONCE")) {
+            // Checks for duplicate with seenMap
+            String cachedResponse = seenMap.get(uuid);
+            if (cachedResponse != null) {
+                Boolean packetLossServerToClient = requestJson.getBoolean("packetLossServerToClient");
+                if (packetLossServerToClient)
+                    throw new Exception("Packet Loss From Server To Client");
+                return cachedResponse;
+            }
         }
 
         // Invoke the appropriate service method based on the function name
@@ -49,6 +62,10 @@ public class FlightServerController {
         String responseString = responseJson.toString();
 
         seenMap.put(uuid, responseString);
+
+        Boolean packetLossServerToClient = requestJson.getBoolean("packetLossServerToClient");
+        if (packetLossServerToClient)
+            throw new Exception("Packet Loss From Server To Client");
 
         return responseString;
     }
