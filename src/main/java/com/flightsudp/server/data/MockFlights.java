@@ -2,7 +2,9 @@ package com.flightsudp.server.data;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MockFlights {
 
@@ -13,6 +15,7 @@ public class MockFlights {
             .departureTime(LocalDateTime.of(2022, 4, 1, 12, 0))
             .airfare(1000L)
             .totalSeats(200)
+            .passengersInfoMap(new HashMap<>())
             .build();
     static Flight flight2 = Flight.builder()
             .id(2L)
@@ -21,6 +24,7 @@ public class MockFlights {
             .departureTime(LocalDateTime.of(2022, 4, 2, 12, 0))
             .airfare(1100L)
             .totalSeats(220)
+            .passengersInfoMap(new HashMap<>())
             .build();
     static Flight flight3 = Flight.builder()
             .id(3L)
@@ -29,6 +33,7 @@ public class MockFlights {
             .departureTime(LocalDateTime.of(2022, 4, 3, 12, 0))
             .airfare(800L)
             .totalSeats(150)
+            .passengersInfoMap(new HashMap<>())
             .build();
     static Flight flight4 = Flight.builder()
             .id(4L)
@@ -37,6 +42,7 @@ public class MockFlights {
             .departureTime(LocalDateTime.of(2022, 4, 4, 12, 0))
             .airfare(900L)
             .totalSeats(170)
+            .passengersInfoMap(new HashMap<>())
             .build();
     static Flight flight5 = Flight.builder()
             .id(5L)
@@ -45,6 +51,7 @@ public class MockFlights {
             .departureTime(LocalDateTime.of(2022, 4, 5, 12, 0))
             .airfare(200L)
             .totalSeats(100)
+            .passengersInfoMap(new HashMap<>())
             .build();
 
     private static List<Flight> allFlights = Arrays.asList(flight1, flight2, flight3, flight4, flight5);

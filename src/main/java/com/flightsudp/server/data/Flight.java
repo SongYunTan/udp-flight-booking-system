@@ -16,11 +16,14 @@ public class Flight {
     LocalDateTime departureTime;
     Long airfare;
     int totalSeats;
-    Map<String, Integer> passengersInfoMap = new HashMap<String, Integer>();
+    Map<String, Integer> passengersInfoMap;
 
     public int reserveSeats(String userId, Integer numSeats) {
         if (totalSeats - numSeats >= 0) {
             totalSeats = totalSeats - numSeats;
+            if (passengersInfoMap == null) {
+                passengersInfoMap = new HashMap<>();
+            }
             // similar to defaultdict in python
             passengersInfoMap.compute(userId, (k, v) -> (v == null) ? numSeats : v + numSeats);
             return totalSeats;

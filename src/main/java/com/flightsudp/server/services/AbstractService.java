@@ -17,7 +17,10 @@ public abstract class AbstractService {
 
     public AbstractService(List<Flight> allFlights) {
         this.allFlights = allFlights;
-        this.allFlightsMap = allFlights
+    }
+
+    public Map<Long, Flight> getAllFlightsMap() {
+        return this.allFlightsMap = allFlights
                 .stream()
                 .collect(Collectors.toMap(Flight::getId, Function.identity()));
     }
@@ -26,7 +29,7 @@ public abstract class AbstractService {
         return eventManager;
     }
 
-    public JSONObject createErrorJSONObject(String errorMessage){
+    public JSONObject createErrorJSONObject(String errorMessage) {
         JSONObject json = new JSONObject();
         json.put("status", "FAILURE");
         json.put("message", errorMessage);

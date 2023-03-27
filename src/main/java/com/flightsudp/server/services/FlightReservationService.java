@@ -14,7 +14,7 @@ public class FlightReservationService extends AbstractService {
     public FlightReservationService(List<Flight> allFlights) {
         super(allFlights);
         this.allFlights = allFlights;
-        this.allFlightsMap = allFlightsMap;
+        this.allFlightsMap = this.getAllFlightsMap();
     }
     @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port) {
@@ -35,8 +35,7 @@ public class FlightReservationService extends AbstractService {
             }
             JSONObject json = new JSONObject();
             json.put("status", "SUCCESS");
-            JSONObject flightJson = new JSONObject();
-            flightJson.put("seats_available", seatsAvail);
+            json.put("seats_available", seatsAvail);
 
             try {
                 this.getEventManager().notifySubscribers(f_id, seatsAvail);
