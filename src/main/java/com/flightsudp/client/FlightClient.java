@@ -223,7 +223,7 @@ public class FlightClient {
                 System.out.println("=".repeat(20) + "\nUpdate Received\n");
                 displayResults(processedResponse, 0);
             } catch (Exception e) {
-                System.out.println(e);
+                // System.out.println(e);
             }
         }
     }
