@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AbstractService {
+public abstract class AbstractService {
 
     private List<Flight> allFlights;
     private Map<Long, Flight> allFlightsMap;
@@ -32,4 +32,6 @@ public class AbstractService {
         json.put("message", errorMessage);
         return json;
     }
+
+    public abstract JSONObject execute(JSONObject jsonRequest, String address, String port);
 }

@@ -14,16 +14,16 @@ public class FlightReservationService extends AbstractService {
     public FlightReservationService(List<Flight> allFlights) {
         super(allFlights);
     }
-
+    @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port) {
         return reserveFlight(jsonRequest, address, port);
     }
 
     private JSONObject reserveFlight(JSONObject jsonRequest, String address, String port) {
         JSONObject data = jsonRequest.getJSONObject("data");
-        String user_id = address + port;
+        String user_id = address + "@" + port;
         Long f_id = Long.valueOf(data.getString("flightid"));
-        int numSeats = Integer.parseInt(data.getString("numseats"));
+        int numSeats = Integer.parseInt(data.getString("numSeats"));
 
         Flight flight = allFlightsMap.get(f_id);
         if (flight != null) {

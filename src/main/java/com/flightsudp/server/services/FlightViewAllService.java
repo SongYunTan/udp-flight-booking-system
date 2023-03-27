@@ -15,13 +15,12 @@ public class FlightViewAllService extends AbstractService {
         super(allFlights);
     }
 
+    @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port) {
         return getAllFlights(jsonRequest, address, port);
     }
 
     private JSONObject getAllFlights(JSONObject jsonRequest, String address, String port) {
-        JSONObject data = jsonRequest.getJSONObject("data");
-
         JSONObject json = new JSONObject();
 
         if (allFlights.isEmpty()) {
