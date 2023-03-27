@@ -4,9 +4,11 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class FlightServerController {
     private Map<String, FlightService> serviceMap;
+    private Map<UUID, String> seenMap;
 
     public FlightServerController() {
         serviceMap = new HashMap<>();
@@ -15,6 +17,8 @@ public class FlightServerController {
         // TODO: XINRUI Add additional services as necessary
         // TODO: XINRUI make pubsub
         // TODO: XINRUI make dummy data + loader into memory
+
+        seenMap = new HashMap<>();
     }
 
     public String processInput(String input) throws Exception {
@@ -22,6 +26,14 @@ public class FlightServerController {
         JSONObject requestJson = new JSONObject(input);
         String functionName = requestJson.getString("function");
         JSONObject params = requestJson.getJSONObject("data");
+
+        // Check against seenMap
+        String str_uuid = requestJson.getString("uuid");
+        UUID uuid = UUID.fromString(str_uuid);
+        String cachedResponse = seenMap.get(uuid);
+        if (cachedResponse != null) {
+            return cachedResponse;
+        }
 
         // Invoke the appropriate service method based on the function name
         FlightService service = serviceMap.get(functionName);
@@ -34,8 +46,11 @@ public class FlightServerController {
         JSONObject responseJson = new JSONObject();
         responseJson.put("status", "success");
         responseJson.put("data", result);
+        String responseString = responseJson.toString();
 
-        return responseJson.toString();
+        seenMap.put(uuid, responseString);
+
+        return responseString;
     }
 
     private String generateErrorResponse(String message) {
@@ -49,6 +64,8 @@ public class FlightServerController {
         return responseJson.toString();
     }
 
-    // TODO: DUANKAI handle duplicate req messages (at-least-once semantics) via histories
-    // TODO: DUANKAI handle monitoring
+
+
+    // TODO: DUANKAI handle duplicate req messages (at-least-once semantics) via histories - DONE
+    // TODO: DUANKAI handle monitoring -> return "monitoring closed" as result when time is up
 }
