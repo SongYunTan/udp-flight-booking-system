@@ -45,7 +45,8 @@ public class FlightClient {
 
             if (userInput.getString("function") == "monitorupdates") {
                 // TODO keep socket open & keep printing results
-                LocalTime expiryDate = LocalTime.parse(userInput.getString("expiryDate"));
+                JSONObject data = userInput.getJSONObject("data");
+                LocalTime expiryDate = LocalTime.parse(data.getString("expiryDate"));
                 receiveDatagramPackets(socket, controller, expiryDate);
             }
         }

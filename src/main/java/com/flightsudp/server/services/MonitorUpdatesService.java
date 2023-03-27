@@ -15,6 +15,8 @@ public class MonitorUpdatesService extends AbstractService {
 
     public MonitorUpdatesService(List<Flight> allFlights) {
         super(allFlights);
+        this.allFlights = allFlights;
+        this.allFlightsMap = this.getAllFlightsMap();
     }
 
     @Override

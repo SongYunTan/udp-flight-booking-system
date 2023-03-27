@@ -31,6 +31,8 @@ public class FlightServerController {
     }
 
     public String processInput(String input, InetAddress clientAddress, Integer clientPort) throws Exception {
+        System.out.println("Packet Received");
+        
         // Parse request JSON from input data
         JSONObject requestJson = new JSONObject(input);
 
