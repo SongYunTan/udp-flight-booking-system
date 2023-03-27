@@ -31,12 +31,16 @@ public class FlightServerController {
     }
 
     public String processInput(String input, InetAddress clientAddress, Integer clientPort) throws Exception {
+        System.out.println("Packet Received");
+        
         // Parse request JSON from input data
         JSONObject requestJson = new JSONObject(input);
 
         Boolean packetLossClientToServer = requestJson.getBoolean("packetLossClientToServer");
-        if (packetLossClientToServer)
+        if (packetLossClientToServer) {
+            System.out.println("packetLossClientServer true");
             throw new Exception("Packet Loss From Client To Server");
+        }
 
         String functionName = requestJson.getString("function");
         JSONObject params = requestJson.getJSONObject("data");

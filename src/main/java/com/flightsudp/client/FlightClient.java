@@ -3,11 +3,12 @@ package com.flightsudp.client;
 import java.io.*;
 import java.net.*;
 import java.text.ParseException;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import com.flightsudp.server.data.DateTimeString;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,8 +37,7 @@ public class FlightClient {
         while (true) {
             try {
                 userInput = getUserInput();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 socket.close();
                 System.exit(0);
             }
@@ -47,9 +47,12 @@ public class FlightClient {
             System.out.println(processedResponse.toString());
             // displayResults(processedResponse, 0);
 
+//            2023-12-12T12:00:00
+
             if (userInput.getString("function") == "monitorupdates") {
                 // TODO keep socket open & keep printing results
-                LocalTime expiryDate = LocalTime.parse(userInput.getString("expiryDate"));
+                JSONObject data = userInput.getJSONObject("data");
+                LocalDateTime expiryDate = new DateTimeString(data.getString("expiryDate")).getLocalDateTime();
                 receiveDatagramPackets(socket, controller, expiryDate);
             }
         }
@@ -61,7 +64,7 @@ public class FlightClient {
         JSONObject params = new JSONObject();
         JSONObject userInput = new JSONObject();
 
-        while (choice<=0 || choice>=8) {
+        while (choice <= 0 || choice >= 8) {
             // Read input from user
             System.out.println("=".repeat(40) + "\n1: Find flight by source and destination\n" +
                     "2: Find flight by flightID\n3: Reserve Flight\n4: Monitor Flight\n5: List Flights\n" +
@@ -218,7 +221,7 @@ public class FlightClient {
         return userInput;
     }
 
-    public static JSONObject getUserChoiceOnPacketLoss (JSONObject userInput) throws IOException {
+    public static JSONObject getUserChoiceOnPacketLoss(JSONObject userInput) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         while(true) {
@@ -268,7 +271,7 @@ public class FlightClient {
 
             // Receive response packet
             // If no response received within 5s, resend packet
-            while(true) {
+            while (true) {
                 try {
                     socket.receive(responsePacket);
                     break;
@@ -300,11 +303,11 @@ public class FlightClient {
         return processedResponse;
     }
 
-    public static void receiveDatagramPackets(DatagramSocket socket, FlightClientController controller, LocalTime expiryDate) {
+    public static void receiveDatagramPackets(DatagramSocket socket, FlightClientController controller, LocalDateTime expiryDate) {
         byte[] responseBytes = new byte[1024];
         DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
 
-        while(LocalTime.now().isBefore(expiryDate)) {
+        while (LocalDateTime.now().isBefore(expiryDate)) {
             try {
                 socket.receive(responsePacket);
                 JSONObject processedResponse = new JSONObject();
@@ -315,29 +318,27 @@ public class FlightClient {
                     System.out.println(e);
                 }
 
-                System.out.println("=".repeat(20)+ "\nUpdate Received\n");
+                System.out.println("=".repeat(20) + "\nUpdate Received\n");
                 displayResults(processedResponse, 0);
             } catch (Exception e) {
-                System.out.println(e);
+                // System.out.println(e);
             }
         }
     }
 
     public static void displayResults(JSONObject jsonObj, int nest) {
         for (String key : jsonObj.keySet()) {
-            System.out.println(" ".repeat(2*(nest)) + key);
+            System.out.println(" ".repeat(2 * (nest)) + key);
 
             if (jsonObj.get(key) instanceof JSONArray) {
                 JSONArray value = jsonObj.getJSONArray(key);
-                for(int i = 0; i < value.length(); i++)
-                {
+                for (int i = 0; i < value.length(); i++) {
                     JSONObject objectInArray = value.getJSONObject(i);
                     String[] elementNames = JSONObject.getNames(objectInArray);
-                    for (int j = elementNames.length-1; j > 0; j--)
-                    {
+                    for (int j = elementNames.length - 1; j > 0; j--) {
                         String elementName = elementNames[j];
                         String elementValue = String.valueOf(objectInArray.get(elementName));
-                        System.out.print(" ".repeat(2*(nest+1)) + elementName + ": ");
+                        System.out.print(" ".repeat(2 * (nest + 1)) + elementName + ": ");
                         System.out.println(elementValue);
                     }
                     System.out.println();
@@ -347,9 +348,8 @@ public class FlightClient {
             else if (jsonObj.get(key) instanceof JSONObject) {
                 JSONObject value = jsonObj.getJSONObject(key);
                 displayResults(value, nest + 1);
-            }
-            else
-                System.out.println(" ".repeat(2*(nest+1)) + jsonObj.get(key));
+            } else
+                System.out.println(" ".repeat(2 * (nest + 1)) + jsonObj.get(key));
         }
     }
 }
