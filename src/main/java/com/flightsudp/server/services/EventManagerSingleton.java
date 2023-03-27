@@ -2,11 +2,14 @@ package com.flightsudp.server.services;
 
 import com.flightsudp.server.data.UserMonitoring;
 
+import java.net.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONObject;
 
 public final class EventManagerSingleton {
 
@@ -49,7 +52,7 @@ public final class EventManagerSingleton {
         return updatedSubscribers;
     }
 
-    public void notifySubscribers(Long f_id, Integer seats) {
+    public void notifySubscribers(Long f_id, Integer seats) throws Exception {
         List<String> u_ids = new ArrayList<>();
         LocalDateTime currentDateTime = LocalDateTime.now();
 
@@ -60,9 +63,27 @@ public final class EventManagerSingleton {
             for (Map.Entry<String, LocalDateTime> entry : userMonitoringMap.entrySet()) {
                 u_ids.add(entry.getKey());
             }
+            
+            DatagramSocket socket = new DatagramSocket();
+                
             for (String u_id : u_ids) {
-                System.out.println("Number of seats left for Flight " + f_id + " is " + seats);
+                JSONObject response = new JSONObject();
+                response.put("status", "SUCCESS");
+                JSONObject data = new JSONObject();
+                data.put("message", "Number of seats left for Flight " + f_id + " is " + seats);
+                response.put("data", data);
+
+                String[] clientInfo = u_id.split("@"); // address@port
+                InetAddress clientAddress = InetAddress.getByName(clientInfo[0]);
+                Integer clientPort = Integer.parseInt(clientInfo[1]);
+
+                byte[] sendData = new byte[1024];
+                sendData = response.toString().getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
+                socket.send(sendPacket);
             }
+
+            socket.close();
         }
     }
 }

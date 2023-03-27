@@ -32,7 +32,7 @@ public class FlightServerController {
 
         // Construct response JSON with status and result data
         JSONObject responseJson = new JSONObject();
-        responseJson.put("status", "success");
+        responseJson.put("status", "SUCCESS");
         responseJson.put("data", result);
 
         return responseJson.toString();
@@ -41,7 +41,7 @@ public class FlightServerController {
     private String generateErrorResponse(String message) {
         // Construct response JSON with error status and error message
         JSONObject responseJson = new JSONObject();
-        responseJson.put("status", "error");
+        responseJson.put("status", "ERROR");
         JSONObject errorData = new JSONObject();
         errorData.put("message", message);
         responseJson.put("data", errorData);
