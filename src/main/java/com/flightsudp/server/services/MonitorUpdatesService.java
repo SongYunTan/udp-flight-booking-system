@@ -36,7 +36,7 @@ public class MonitorUpdatesService extends AbstractService {
             this.getEventManager().addSubscriber(f_id, userMonitoring);
 
             JSONObject json = new JSONObject();
-            json.put("code", "SUCCESS");
+            json.put("status", "SUCCESS");
             return json;
         }
         return this.createErrorJSONObject("No flight found");
