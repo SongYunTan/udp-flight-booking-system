@@ -2,14 +2,18 @@ package com.flightsudp.client;
 
 import java.io.*;
 import java.net.*;
+import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class FlightClient {
 
+    final static String DATE_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static void main(String[] args) throws IOException {
         // Check for correct command line arguments
         if (args.length != 2) {
@@ -68,32 +72,96 @@ public class FlightClient {
             switch (choice) {
                 case 1: {
                     userInput.put("function", "flightids");
-                    System.out.print("Enter source: ");
-                    params.put("source", reader.readLine());
-                    System.out.print("Enter destination: ");
-                    params.put("destination", reader.readLine());
+                    while (true) {
+                        System.out.print("Enter source: ");
+                        String source = reader.readLine();
+                        System.out.print("Enter destination: ");
+                        String destination = reader.readLine();
+                        if (!source.isEmpty() && !destination.isEmpty()) {
+                            params.put("source", source);
+                            params.put("destination", destination);
+                            break;
+                        } else {
+                            System.out.println("Invalid input, please try again...");
+                        }
+                    }
                     break;
                 }
                 case 2: {
                     userInput.put("function", "flightdetails");
-                    System.out.print("Enter flight ID: ");
-                    params.put("flightid", reader.readLine());
+                    while (true) {
+                        System.out.print("Enter flight ID: ");
+                        String flightID = reader.readLine();
+                        Boolean invalidInput;
+                        try {
+                            invalidInput = Boolean.FALSE;
+                            Integer.parseInt(flightID);
+                        } catch (NumberFormatException ex) {
+                            invalidInput = Boolean.TRUE;
+                        }
+
+                        if (!flightID.isEmpty() && !invalidInput) {
+                            params.put("flightid", reader.readLine());
+                            break;
+                        } else {
+                            System.out.println("Invalid input, please try again...");
+                        }
+                    }
                     break;
                 }
                 case 3: {
                     userInput.put("function", "flightreservation");
-                    System.out.print("Enter flight ID: ");
-                    params.put("flightid", reader.readLine());
-                    System.out.print("Enter number of seats to reserve: ");
-                    params.put("numSeats", reader.readLine());
+                    while (true) {
+                        System.out.print("Enter flight ID: ");
+                        String flightID = reader.readLine();
+                        System.out.print("Enter number of seats to reserve: ");
+                        String numSeats = reader.readLine();
+                        Boolean invalidInput;
+                        try {
+                            invalidInput = Boolean.FALSE;
+                            Integer.parseInt(flightID);
+                            Integer.parseInt(numSeats);
+                        } catch (NumberFormatException ex) {
+                            invalidInput = Boolean.TRUE;
+                        }
+
+                        if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
+                            params.put("flightid", reader.readLine());
+                            params.put("numSeats", reader.readLine());
+                            break;
+                        } else {
+                            System.out.println("Invalid input, please try again...");
+                        }
+                    }
                     break;
                 }
                 case 4: {
                     userInput.put("function", "monitorupdates");
-                    System.out.print("Enter flight ID: ");
-                    params.put("flightid", reader.readLine());
-                    System.out.print("Enter expiry date i.e. 2022-04-01T12:00:00: ");
-                    params.put("expiryDate", reader.readLine());
+                    while (true) {
+                        System.out.print("Enter flight ID: ");
+                        String flightID = reader.readLine();
+                        System.out.print("Enter expiry date i.e. 2022-04-01T12:00:00: ");
+                        String expiryDate = reader.readLine();
+                        Boolean invalidInput;
+                        Boolean invalidDate;
+                        try {
+                            invalidInput = Boolean.FALSE;
+                            invalidDate = Boolean.FALSE;
+                            Integer.parseInt(flightID);
+                            SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+                            Date date = formatter.parse(expiryDate);
+                        } catch (ParseException ex) {
+                            invalidInput = Boolean.TRUE;
+                            invalidDate = Boolean.TRUE;
+                        }
+                        if (!flightID.isEmpty() && !expiryDate.isEmpty() && !invalidDate && !invalidInput) {
+                            params.put("flightid", flightID);
+                            params.put("expiryDate", reader.readLine());
+                            break;
+                        } else {
+                            System.out.println("Invalid input, please try again...");
+                        }
+                    }
                     break;
                 }
                 case 5: {
@@ -102,10 +170,28 @@ public class FlightClient {
                 }
                 case 6: {
                     userInput.put("function", "flightcancellation");
-                    System.out.print("Enter flight ID: ");
-                    params.put("flightid", reader.readLine());
-                    System.out.print("Enter number of seats to cancel: ");
-                    params.put("numSeats", reader.readLine());
+                    while (true) {
+                        System.out.print("Enter flight ID: ");
+                        String flightID = reader.readLine();
+                        System.out.print("Enter number of seats to cancel: ");
+                        String numSeats = reader.readLine();
+                        Boolean invalidInput;
+                        try {
+                            invalidInput = Boolean.FALSE;
+                            Integer.parseInt(flightID);
+                            Integer.parseInt(numSeats);
+                        } catch (NumberFormatException ex) {
+                            invalidInput = Boolean.TRUE;
+                        }
+
+                        if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
+                            params.put("flightid", reader.readLine());
+                            params.put("numSeats", reader.readLine());
+                            break;
+                        } else {
+                            System.out.println("Invalid input, please try again...");
+                        }
+                    }
                     break;
                 }
                 case 7: {
@@ -135,21 +221,34 @@ public class FlightClient {
     public static JSONObject getUserChoiceOnPacketLoss (JSONObject userInput) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        System.out.print("Simulate packet loss from client to server? Enter Y/N: ");
-        if (Objects.equals(reader.readLine(), "Y")) {
-            userInput.put("packetLossClientToServer", Boolean.TRUE);
-            userInput.put("packetLossServerToClient", Boolean.FALSE);
-        } else {
-            userInput.put("packetLossClientToServer", Boolean.FALSE);
-            System.out.print("Simulate packet loss from server to client? Enter Y/N: ");
-            if (Objects.equals(reader.readLine(), "Y") || Objects.equals(reader.readLine(), "y")) {
-                userInput.put("packetLossServerToClient", Boolean.TRUE);
-            } else {
+        while(true) {
+            System.out.print("Simulate packet loss from client to server? Enter Y/N: ");
+            String choice = reader.readLine();
+            if (Objects.equals(choice, "Y") || Objects.equals(choice, "y")) {
+                userInput.put("packetLossClientToServer", Boolean.TRUE);
                 userInput.put("packetLossServerToClient", Boolean.FALSE);
+                return userInput;
+
+            } else if (Objects.equals(choice, "N") || Objects.equals(choice, "n")) {
+                userInput.put("packetLossClientToServer", Boolean.FALSE);
+                while(true) {
+                    System.out.print("Simulate packet loss from server to client? Enter Y/N: ");
+                    choice = reader.readLine();
+                    if (Objects.equals(choice, "Y") || Objects.equals(choice, "y")) {
+                        userInput.put("packetLossServerToClient", Boolean.TRUE);
+                        return userInput;
+                    } else if (Objects.equals(choice, "N") || Objects.equals(choice, "n")) {
+                        userInput.put("packetLossServerToClient", Boolean.FALSE);
+                        return userInput;
+                    } else {
+                        System.out.println("Invalid input, please try again...");
+                    }
+                }
+
+            } else {
+                System.out.println("Invalid input, please try again...");
             }
         }
-
-        return userInput;
     }
 
     public static JSONObject sendAndReceiveDatagramPacket(DatagramSocket socket, FlightClientController controller, String serverAddress, int serverPortNumber, JSONObject userInput) throws SocketException, UnknownHostException {
@@ -254,3 +353,4 @@ public class FlightClient {
         }
     }
 }
+
