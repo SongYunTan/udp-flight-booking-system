@@ -51,7 +51,7 @@ public class FlightClient {
         while (choice<=0 || choice>=9) {
             // Read input from user
             System.out.println("=".repeat(40) + "\n1: Find flight by source and destination\n" +
-                    "2: Find flight by flightID\n3: Reserve Flight\n4: Monitor Flight\n5: Get Cheaper Flights\n" +
+                    "2: Find flight by flightID\n3: Reserve Flight\n4: Monitor Flight\n5: List Flights\n" +
                     "6: Cancel Flight\n7: Quit");
             System.out.print("Enter your choice: ");
             choice = Integer.parseInt(reader.readLine());
@@ -89,6 +89,7 @@ public class FlightClient {
                 }
                 case 5: {
                     userInput.put("function", "listFlights");
+                    break;
                 }
                 case 6: {
                     userInput.put("function", "flightcancellation");

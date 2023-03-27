@@ -36,7 +36,11 @@ public class FlightReservationService extends AbstractService {
             JSONObject flightJson = new JSONObject();
             flightJson.put("seats_available", seatsAvail);
 
-            this.getEventManager().notifySubscribers(f_id, seatsAvail);
+            try {
+                this.getEventManager().notifySubscribers(f_id, seatsAvail);
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
 
             return json;
         }
