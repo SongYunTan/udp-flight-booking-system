@@ -8,10 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class FlightClient {
-    enum Semantics{
-        AT_LEAST_ONCE,
-        AT_MOST_ONCE
-    }
 
     public static void main(String[] args) throws IOException {
         // Check for correct command line arguments
@@ -33,7 +29,7 @@ public class FlightClient {
             // Generate request bytes using FlightClientController object
             byte[] requestBytes = controller.generateRequest(userInput);
             // Send packet to server
-            DatagramPacket responsePacket = sendAndReceiveDatagramPacket(serverAddress, serverPortNumber, requestBytes, userInput.getString("semantics"));
+            DatagramPacket responsePacket = sendAndReceiveDatagramPacket(serverAddress, serverPortNumber, requestBytes);
             // Process response using FlightClientController object
             JSONObject processedResponse = null;
             try {
@@ -92,10 +88,7 @@ public class FlightClient {
                     break;
                 }
                 case 5: {
-                    userInput.put("function", "getcheaper");
-                    System.out.print("Enter airfare: ");
-                    params.put("airfare", reader.readLine());
-                    break;
+                    userInput.put("function", "listFlights");
                 }
                 case 6: {
                     userInput.put("function", "flightcancellation");
@@ -108,10 +101,6 @@ public class FlightClient {
                 case 7: {
                     System.out.println("Exiting...");
                     System.exit(0);
-                }
-                case 8: {
-                    userInput.put("function", "listFlights");
-                    break;
                 }
                 default: {
                     System.out.println("Invalid number, please try again...");
@@ -138,7 +127,7 @@ public class FlightClient {
         return userInput;
     }
 
-    public static DatagramPacket sendAndReceiveDatagramPacket(String serverAddress, int serverPortNumber, byte[] requestBytes, String semantics) throws SocketException, UnknownHostException {
+    public static DatagramPacket sendAndReceiveDatagramPacket(String serverAddress, int serverPortNumber, byte[] requestBytes) throws SocketException, UnknownHostException {
         // Create socket and packet for sending and receiving data
         DatagramSocket socket = new DatagramSocket();
         InetAddress serverInetAddress = InetAddress.getByName(serverAddress);
@@ -160,14 +149,9 @@ public class FlightClient {
                     socket.receive(responsePacket);
                     break;
                 } catch (SocketTimeoutException e) {
-                    if (semantics == "AT-LEAST-ONCE") {
-                        // Resend request packet after timeout
-                        socket.send(requestPacket);
-                        System.out.println("Sending packet");
-                    } else {
-                        System.out.println("No response received from server");
-                        return null;
-                    }
+                    // Resend request packet after timeout
+                    socket.send(requestPacket);
+                    System.out.println("Sending packet");
                 }
             }
 

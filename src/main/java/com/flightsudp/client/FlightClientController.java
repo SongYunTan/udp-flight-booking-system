@@ -7,9 +7,10 @@ import java.util.UUID;
 public class FlightClientController {
     public byte[] generateRequest(JSONObject requestJson) {
         UUID uuid = UUID.randomUUID();
+        String UUIDString = uuid.toString();
 
         // Construct request JSON with function name and parameters
-        requestJson.put("uuid", uuid);
+        requestJson.put("uuid", UUIDString);
 
         // Convert request JSON to byte array
         return requestJson.toString().getBytes();
