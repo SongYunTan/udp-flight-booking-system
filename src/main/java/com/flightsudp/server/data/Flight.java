@@ -35,7 +35,7 @@ public class Flight {
         if (passengersInfoMap.containsKey(userId) && passengersInfoMap.get(userId) >= numSeats) {
             // Update the map with the new value
             passengersInfoMap.computeIfPresent(userId, (k, v) -> v - numSeats);
-            totalSeats = totalSeats - numSeats;
+            totalSeats = totalSeats + numSeats;
             return totalSeats;
         }
         return -1;

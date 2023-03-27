@@ -14,7 +14,7 @@ public class FlightCancellationService extends AbstractService {
     public FlightCancellationService(List<Flight> allFlights) {
         super(allFlights);
         this.allFlights = allFlights;
-        this.allFlightsMap = allFlightsMap;
+        this.allFlightsMap = this.getAllFlightsMap();
     }
     @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port){
