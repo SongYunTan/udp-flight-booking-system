@@ -23,7 +23,7 @@ public class FlightReservationService extends AbstractService {
         JSONObject data = jsonRequest.getJSONObject("data");
         String user_id = address + "@" + port;
         Long f_id = Long.valueOf(data.getString("flightid"));
-        int numSeats = Integer.parseInt(data.getString("numseats"));
+        int numSeats = Integer.parseInt(data.getString("numSeats"));
 
         Flight flight = allFlightsMap.get(f_id);
         if (flight != null) {

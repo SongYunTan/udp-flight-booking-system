@@ -21,8 +21,6 @@ public class FlightViewAllService extends AbstractService {
     }
 
     private JSONObject getAllFlights(JSONObject jsonRequest, String address, String port) {
-        JSONObject data = jsonRequest.getJSONObject("data");
-
         JSONObject json = new JSONObject();
 
         if (allFlights.isEmpty()) {

@@ -26,9 +26,10 @@ public class MonitorUpdatesService extends AbstractService {
         JSONObject data = jsonRequest.getJSONObject("data");
         String user_id = address + "@" + port;
         Long f_id = Long.valueOf(data.getString("flightid"));
+//        String dateTimeString = "2022-04-01T12:00:00";
+        LocalDateTime monitorEndDateTime = new DateTimeString(data.getString("expiryDate")).getLocalDateTime();
 
         if (allFlightsMap.containsKey(f_id)) {
-            LocalDateTime monitorEndDateTime = new DateTimeString(data.getString("numseats")).getLocalDateTime();
             UserMonitoring userMonitoring = new UserMonitoring();
             userMonitoring.setU_id(user_id);
             userMonitoring.setDatetime(monitorEndDateTime);

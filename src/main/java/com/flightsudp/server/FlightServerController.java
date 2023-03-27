@@ -17,12 +17,12 @@ public class FlightServerController {
     public FlightServerController() {
         serviceMap = new HashMap<>();
         // Add FlightService implementations to the service map
-        serviceMap.put("cancelFlight", new FlightCancellationService(allFlights));
-        serviceMap.put("flightDetails", new FlightDetailsService(allFlights));
-        serviceMap.put("flightIDs", new FlightIDsService(allFlights));
-        serviceMap.put("flightReservation", new FlightReservationService(allFlights));
-        serviceMap.put("flightViewAll", new FlightViewAllService(allFlights));
-        serviceMap.put("monitorUpdates", new MonitorUpdatesService(allFlights));
+        serviceMap.put("flightids", new FlightIDsService(allFlights));
+        serviceMap.put("flightdetails", new FlightDetailsService(allFlights));
+        serviceMap.put("flightreservation", new FlightReservationService(allFlights));
+        serviceMap.put("monitorupdates", new MonitorUpdatesService(allFlights));
+        serviceMap.put("listFlights", new FlightViewAllService(allFlights));
+        serviceMap.put("flightcancellation", new FlightCancellationService(allFlights));
     }
 
     public String processInput(String input, InetAddress clientAddress, Integer clientPort) throws Exception {
