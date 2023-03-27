@@ -102,9 +102,8 @@ public class FlightClient {
                         } catch (NumberFormatException ex) {
                             invalidInput = Boolean.TRUE;
                         }
-
                         if (!flightID.isEmpty() && !invalidInput) {
-                            params.put("flightid", reader.readLine());
+                            params.put("flightid", flightID);
                             break;
                         } else {
                             System.out.println("Invalid input, please try again...");
@@ -129,8 +128,8 @@ public class FlightClient {
                         }
 
                         if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
-                            params.put("flightid", reader.readLine());
-                            params.put("numSeats", reader.readLine());
+                            params.put("flightid", flightID);
+                            params.put("numSeats", numSeats);
                             break;
                         } else {
                             System.out.println("Invalid input, please try again...");
@@ -145,21 +144,23 @@ public class FlightClient {
                         String flightID = reader.readLine();
                         System.out.print("Enter expiry date i.e. 2022-04-01T12:00:00: ");
                         String expiryDate = reader.readLine();
+
                         Boolean invalidInput;
                         Boolean invalidDate;
                         try {
                             invalidInput = Boolean.FALSE;
                             invalidDate = Boolean.FALSE;
                             Integer.parseInt(flightID);
-                            SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-                            Date date = formatter.parse(expiryDate);
-                        } catch (ParseException ex) {
+                            LocalDateTime localDateTime = new DateTimeString(expiryDate).getLocalDateTime();
+                            // SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+                            // Date date = formatter.parse(expiryDate);
+                        } catch (Exception e) {
                             invalidInput = Boolean.TRUE;
                             invalidDate = Boolean.TRUE;
                         }
                         if (!flightID.isEmpty() && !expiryDate.isEmpty() && !invalidDate && !invalidInput) {
                             params.put("flightid", flightID);
-                            params.put("expiryDate", reader.readLine());
+                            params.put("expiryDate", expiryDate);
                             break;
                         } else {
                             System.out.println("Invalid input, please try again...");
@@ -188,8 +189,8 @@ public class FlightClient {
                         }
 
                         if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
-                            params.put("flightid", reader.readLine());
-                            params.put("numSeats", reader.readLine());
+                            params.put("flightid", flightID);
+                            params.put("numSeats", numSeats);
                             break;
                         } else {
                             System.out.println("Invalid input, please try again...");
