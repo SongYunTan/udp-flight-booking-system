@@ -14,14 +14,14 @@ public class FlightCancellationService extends AbstractService {
     public FlightCancellationService(List<Flight> allFlights) {
         super(allFlights);
     }
-
+    @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port){
         return cancelFlight(jsonRequest, address, port);
     }
 
     private JSONObject cancelFlight(JSONObject jsonRequest, String address, String port) {
         JSONObject data = jsonRequest.getJSONObject("data");
-        String user_id = address + port;
+        String user_id = address + "@" + port;
         Long f_id = Long.valueOf(data.getString("flightid"));
         int numSeats = Integer.parseInt(data.getString("numseats"));
 

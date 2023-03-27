@@ -17,13 +17,14 @@ public class MonitorUpdatesService extends AbstractService {
         super(allFlights);
     }
 
+    @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port) {
         return addToMonitor(jsonRequest, address, port);
     }
 
     private JSONObject addToMonitor(JSONObject jsonRequest, String address, String port) {
         JSONObject data = jsonRequest.getJSONObject("data");
-        String user_id = address + port;
+        String user_id = address + "@" + port;
         Long f_id = Long.valueOf(data.getString("flightid"));
 
         if (allFlightsMap.containsKey(f_id)) {
