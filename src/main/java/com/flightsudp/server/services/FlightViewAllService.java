@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FlightViewAllService extends AbstractService {
     private List<Flight> allFlights;
@@ -13,6 +14,8 @@ public class FlightViewAllService extends AbstractService {
 
     public FlightViewAllService(List<Flight> allFlights) {
         super(allFlights);
+        this.allFlights = allFlights;
+        this.allFlightsMap = allFlightsMap;
     }
 
     @Override
@@ -28,7 +31,8 @@ public class FlightViewAllService extends AbstractService {
         } else {
             json.put("status", "SUCCESS");
             JSONObject flightJson = new JSONObject();
-            flightJson.put("all_flights", allFlights.stream().map(Flight::getId));
+            flightJson.put("all_flights", allFlights.stream().map(Flight::getId).collect(Collectors.toList()));
+            json.put("data", flightJson);
             return json;
         }
     }

@@ -13,6 +13,8 @@ public class FlightIDsService extends AbstractService {
 
     public FlightIDsService(List<Flight> allFlights) {
         super(allFlights);
+        this.allFlights = allFlights;
+        this.allFlightsMap = allFlightsMap;
     }
     @Override
     public JSONObject execute(JSONObject jsonRequest, String address, String port){

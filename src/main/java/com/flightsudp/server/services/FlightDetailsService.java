@@ -13,6 +13,8 @@ public class FlightDetailsService extends AbstractService {
 
     public FlightDetailsService(List<Flight> allFlights) {
         super(allFlights);
+        this.allFlights = allFlights;
+        this.allFlightsMap = allFlightsMap;
     }
 
     @Override
@@ -35,10 +37,7 @@ public class FlightDetailsService extends AbstractService {
             return this.createErrorJSONObject("No flight found");
         } else {
             json.put("status", "SUCCESS");
-            JSONObject flightJson = new JSONObject();
-            flightJson.put("departure_time", flight.get().getDepartureTime());
-            flightJson.put("air_fare", flight.get().getAirfare());
-            json.put("seat_availability", flight.get().getTotalSeats());
+            json.put("flight_details", flight.get());
             return json;
         }
     }
