@@ -36,7 +36,6 @@ public class FlightServer {
                 break;
             }
 
-            // Process input using FlightServerController object
             try {
                 InetAddress clientAddress = receivePacket.getAddress();
                 Integer clientPort = receivePacket.getPort();
