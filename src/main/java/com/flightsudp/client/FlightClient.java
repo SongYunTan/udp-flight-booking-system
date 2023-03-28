@@ -42,7 +42,7 @@ public class FlightClient {
                 // Send packet to server
                 JSONObject processedResponse = sendAndReceiveDatagramPacket(socket, controller, serverAddress, serverPortNumber, userInput);
                 System.out.println("=".repeat(20) + "\nDisplaying Results\n");
-                System.out.println(processedResponse.toString());
+                displayResults(processedResponse);
             } catch (Exception e) {
                 System.out.println("=".repeat(20) + "\nDisplaying Results\n");
                 System.out.println("ERROR: " + e.getMessage());
@@ -273,6 +273,7 @@ public class FlightClient {
                     socket.send(requestPacket);
                 }
             }
+            socket.setSoTimeout(0);
 
         } catch (Exception e) {
             throw e;
@@ -305,38 +306,30 @@ public class FlightClient {
                 }
 
                 System.out.println("=".repeat(20) + "\nUpdate Received\n");
-                displayResults(processedResponse, 0);
+                displayResults(processedResponse);
             } catch (Exception e) {
-                // System.out.println(e);
+                 System.out.println(e);
             }
         }
     }
 
-    public static void displayResults(JSONObject jsonObj, int nest) {
+    public static void displayResults(JSONObject jsonObj) {
         for (String key : jsonObj.keySet()) {
-            System.out.println(" ".repeat(2 * (nest)) + key);
+            String keyStr = key.replace('_', ' ');
+            keyStr = Character.toUpperCase(keyStr.charAt(0)) + keyStr.substring(1);
+            System.out.print(keyStr + ": ");
 
             if (jsonObj.get(key) instanceof JSONArray) {
                 JSONArray value = jsonObj.getJSONArray(key);
-                for (int i = 0; i < value.length(); i++) {
-                    JSONObject objectInArray = value.getJSONObject(i);
-                    String[] elementNames = JSONObject.getNames(objectInArray);
-                    for (int j = elementNames.length - 1; j > 0; j--) {
-                        String elementName = elementNames[j];
-                        String elementValue = String.valueOf(objectInArray.get(elementName));
-                        System.out.print(" ".repeat(2 * (nest + 1)) + elementName + ": ");
-                        System.out.println(elementValue);
-                    }
-                    System.out.println();
+                for (int i=0; i < value.length(); i++) {
+                    System.out.print(value.get(i));
+                    if (i != value.length()-1)
+                        System.out.print(", ");
                 }
-            }
-            //for nested objects iteration if required
-            else if (jsonObj.get(key) instanceof JSONObject) {
-                JSONObject value = jsonObj.getJSONObject(key);
-                displayResults(value, nest + 1);
-            } else
-                System.out.println(" ".repeat(2 * (nest + 1)) + jsonObj.get(key));
+            }else
+                System.out.println(jsonObj.get(key));
         }
+        System.out.println();
     }
 }
 
