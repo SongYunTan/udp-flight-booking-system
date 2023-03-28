@@ -27,13 +27,12 @@ public class FlightClientController {
 
         // Get response status and data
         String status = responseJson.getString("status");
-        JSONObject data = responseJson.getJSONObject("data");
 
         // Check response status and return data or error message
         if (status.equals("SUCCESS")) {
-            return data;
+            return responseJson.getJSONObject("data");
         } else {
-            throw new Exception(data.getString("message"));
+            throw new Exception(responseJson.getString("message"));
         }
     }
 }

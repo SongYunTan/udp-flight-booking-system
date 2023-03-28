@@ -35,8 +35,9 @@ public class FlightCancellationService extends AbstractService {
             }
             JSONObject json = new JSONObject();
             json.put("status", "SUCCESS");
-            JSONObject flightJson = new JSONObject();
-            flightJson.put("seats_available", seatsAvail);
+            JSONObject responseData = new JSONObject();
+            responseData.put("seats_available", seatsAvail);
+            json.put("data", responseData);
 
             try {
                 this.getEventManager().notifySubscribers(f_id, seatsAvail);

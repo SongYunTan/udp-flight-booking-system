@@ -65,12 +65,7 @@ public class FlightServerController {
         if (service == null) {
             return generateErrorResponse("Invalid function name: " + functionName);
         }
-        JSONObject result = service.execute(requestJson, clientAddress.getHostAddress(), clientPort.toString());
-
-        // Construct response JSON with status and result data
-        JSONObject responseJson = new JSONObject();
-        responseJson.put("status", "SUCCESS");
-        responseJson.put("data", result);
+        JSONObject responseJson = service.execute(requestJson, clientAddress.getHostAddress(), clientPort.toString());
         String responseString = responseJson.toString();
 
         seenMap.put(uuid, responseString);
@@ -92,9 +87,4 @@ public class FlightServerController {
 
         return responseJson.toString();
     }
-
-
-
-    // TODO: DUANKAI handle duplicate req messages (at-least-once semantics) via histories - DONE
-    // TODO: DUANKAI handle monitoring -> return "monitoring closed" as result when time is up
 }

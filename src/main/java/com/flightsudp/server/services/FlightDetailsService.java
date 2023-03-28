@@ -37,7 +37,10 @@ public class FlightDetailsService extends AbstractService {
             return this.createErrorJSONObject("No flight found");
         } else {
             json.put("status", "SUCCESS");
-            json.put("flight_details", flight.get());
+            JSONObject responseData = new JSONObject();
+            responseData.put("flight_details", flight.get());
+            json.put("data", responseData);
+
             return json;
         }
     }
