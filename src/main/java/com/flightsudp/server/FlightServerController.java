@@ -87,9 +87,4 @@ public class FlightServerController {
 
         return responseJson.toString();
     }
-
-
-
-    // TODO: DUANKAI handle duplicate req messages (at-least-once semantics) via histories - DONE
-    // TODO: DUANKAI handle monitoring -> return "monitoring closed" as result when time is up
 }

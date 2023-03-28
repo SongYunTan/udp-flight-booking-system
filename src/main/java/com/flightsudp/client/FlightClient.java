@@ -2,11 +2,8 @@ package com.flightsudp.client;
 
 import java.io.*;
 import java.net.*;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 
 import com.flightsudp.server.data.DateTimeString;
 import org.json.JSONArray;
@@ -14,7 +11,6 @@ import org.json.JSONObject;
 
 public class FlightClient {
 
-    final static String DATE_FORMAT = "yyyy-MM-ddTHH:mm:ss";
     public static void main(String[] args) throws IOException {
         // Check for correct command line arguments
         if (args.length != 2) {
@@ -52,12 +48,8 @@ public class FlightClient {
                 System.out.println("ERROR: " + e.getMessage());
             }
 
-            // displayResults(processedResponse, 0);
-
-//            2023-12-12T12:00:00
-
             if (userInput.getString("function") == "monitorupdates") {
-                // TODO keep socket open & keep printing results
+                // Keep socket open and keep printing results
                 JSONObject data = userInput.getJSONObject("data");
                 LocalDateTime expiryDate = new DateTimeString(data.getString("expiryDate")).getLocalDateTime();
                 receiveDatagramPackets(socket, controller, expiryDate);
@@ -92,12 +84,12 @@ public class FlightClient {
                         String source = reader.readLine();
                         System.out.print("Enter destination: ");
                         String destination = reader.readLine();
-                        if (!source.isEmpty() && !destination.isEmpty()) {
+                        if (!source.isEmpty() && !destination.isEmpty() && source.matches("[a-zA-Z]+") && destination.matches("[a-zA-Z]+")) {
                             params.put("source", source);
                             params.put("destination", destination);
                             break;
                         } else {
-                            System.out.println("Invalid input, please try again...");
+                            System.out.println("Invalid string, please try again...");
                         }
                     }
                     break;
@@ -107,18 +99,12 @@ public class FlightClient {
                     while (true) {
                         System.out.print("Enter flight ID: ");
                         String flightID = reader.readLine();
-                        Boolean invalidInput;
                         try {
-                            invalidInput = Boolean.FALSE;
                             Integer.parseInt(flightID);
-                        } catch (NumberFormatException ex) {
-                            invalidInput = Boolean.TRUE;
-                        }
-                        if (!flightID.isEmpty() && !invalidInput) {
                             params.put("flightid", flightID);
                             break;
-                        } else {
-                            System.out.println("Invalid input, please try again...");
+                        } catch (NumberFormatException ex) {
+                            System.out.println("Invalid number, please try again...");
                         }
                     }
                     break;
@@ -130,21 +116,14 @@ public class FlightClient {
                         String flightID = reader.readLine();
                         System.out.print("Enter number of seats to reserve: ");
                         String numSeats = reader.readLine();
-                        Boolean invalidInput;
                         try {
-                            invalidInput = Boolean.FALSE;
                             Integer.parseInt(flightID);
                             Integer.parseInt(numSeats);
-                        } catch (NumberFormatException ex) {
-                            invalidInput = Boolean.TRUE;
-                        }
-
-                        if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
                             params.put("flightid", flightID);
                             params.put("numSeats", numSeats);
                             break;
-                        } else {
-                            System.out.println("Invalid input, please try again...");
+                        } catch (NumberFormatException ex) {
+                            System.out.println("Invalid number, please try again...");
                         }
                     }
                     break;
@@ -157,25 +136,19 @@ public class FlightClient {
                         System.out.print("Enter expiry date i.e. 2022-04-01T12:00:00: ");
                         String expiryDate = reader.readLine();
 
-                        Boolean invalidInput;
-                        Boolean invalidDate;
                         try {
-                            invalidInput = Boolean.FALSE;
-                            invalidDate = Boolean.FALSE;
                             Integer.parseInt(flightID);
-                            LocalDateTime localDateTime = new DateTimeString(expiryDate).getLocalDateTime();
-                            // SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
-                            // Date date = formatter.parse(expiryDate);
-                        } catch (Exception e) {
-                            invalidInput = Boolean.TRUE;
-                            invalidDate = Boolean.TRUE;
-                        }
-                        if (!flightID.isEmpty() && !expiryDate.isEmpty() && !invalidDate && !invalidInput) {
+                            LocalDateTime expiryDateTime = new DateTimeString(expiryDate).getLocalDateTime();
+                            if ((LocalDateTime.now().isAfter(expiryDateTime))) {
+                                throw new Exception();
+                            }
                             params.put("flightid", flightID);
                             params.put("expiryDate", expiryDate);
                             break;
-                        } else {
-                            System.out.println("Invalid input, please try again...");
+                        } catch (NumberFormatException ex) {
+                            System.out.println("Invalid number, please try again...");
+                        } catch (Exception e) {
+                            System.out.println("Invalid date, please try again...");
                         }
                     }
                     break;
@@ -191,20 +164,13 @@ public class FlightClient {
                         String flightID = reader.readLine();
                         System.out.print("Enter number of seats to cancel: ");
                         String numSeats = reader.readLine();
-                        Boolean invalidInput;
                         try {
-                            invalidInput = Boolean.FALSE;
                             Integer.parseInt(flightID);
                             Integer.parseInt(numSeats);
-                        } catch (NumberFormatException ex) {
-                            invalidInput = Boolean.TRUE;
-                        }
-
-                        if (!flightID.isEmpty() && !numSeats.isEmpty() && !invalidInput) {
                             params.put("flightid", flightID);
                             params.put("numSeats", numSeats);
                             break;
-                        } else {
+                        } catch (NumberFormatException ex) {
                             System.out.println("Invalid input, please try again...");
                         }
                     }
@@ -222,11 +188,18 @@ public class FlightClient {
 
         userInput.put("data", params);
 
-        System.out.print("=".repeat(20) + "\n1: at-least-once\n2: at-most-once\nEnter invocation semantics: ");
-        if (Objects.equals(reader.readLine(), "1")) {
-            userInput.put("semantics", "AT-LEAST-ONCE");
-        } else {
-            userInput.put("semantics", "AT-MOST-ONCE");
+        while (true) {
+            System.out.print("=".repeat(20) + "\n1: at-least-once\n2: at-most-once\nEnter invocation semantics: ");
+            String semanticsChoice = reader.readLine();
+            if (Objects.equals(semanticsChoice, "1")) {
+                userInput.put("semantics", "AT-LEAST-ONCE");
+                break;
+            } else if (Objects.equals(semanticsChoice, "2")){
+                userInput.put("semantics", "AT-MOST-ONCE");
+                break;
+            } else {
+                System.out.println("Invalid input, please try again...");
+            }
         }
 
         userInput = getUserChoiceOnPacketLoss(userInput);
