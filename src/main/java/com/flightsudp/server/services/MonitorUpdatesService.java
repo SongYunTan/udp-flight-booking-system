@@ -39,6 +39,10 @@ public class MonitorUpdatesService extends AbstractService {
 
             JSONObject json = new JSONObject();
             json.put("status", "SUCCESS");
+            JSONObject responseData = new JSONObject();
+            responseData.put("message", "Successfully added to monitor service!");
+            json.put("data", responseData);
+
             return json;
         }
         return this.createErrorJSONObject("No flight found");

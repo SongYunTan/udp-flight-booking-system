@@ -41,10 +41,17 @@ public class FlightClient {
                 socket.close();
                 System.exit(0);
             }
-            // Send packet to server
-            JSONObject processedResponse = sendAndReceiveDatagramPacket(socket, controller, serverAddress, serverPortNumber, userInput);
-            System.out.println("=".repeat(20) + "\nDisplaying Results\n");
-            System.out.println(processedResponse.toString());
+
+            try {
+                // Send packet to server
+                JSONObject processedResponse = sendAndReceiveDatagramPacket(socket, controller, serverAddress, serverPortNumber, userInput);
+                System.out.println("=".repeat(20) + "\nDisplaying Results\n");
+                System.out.println(processedResponse.toString());
+            } catch (Exception e) {
+                System.out.println("=".repeat(20) + "\nDisplaying Results\n");
+                System.out.println("ERROR: " + e.getMessage());
+            }
+
             // displayResults(processedResponse, 0);
 
 //            2023-12-12T12:00:00
@@ -70,7 +77,12 @@ public class FlightClient {
                     "2: Find flight by flightID\n3: Reserve Flight\n4: Monitor Flight\n5: List Flights\n" +
                     "6: Cancel Flight\n7: Quit");
             System.out.print("Enter your choice: ");
-            choice = Integer.parseInt(reader.readLine());
+            try {
+                choice = Integer.parseInt(reader.readLine());
+            } catch (NumberFormatException ex) {
+                System.out.println("Invalid input, please try again...");
+                continue;
+            }
 
             switch (choice) {
                 case 1: {
@@ -255,7 +267,7 @@ public class FlightClient {
         }
     }
 
-    public static JSONObject sendAndReceiveDatagramPacket(DatagramSocket socket, FlightClientController controller, String serverAddress, int serverPortNumber, JSONObject userInput) throws SocketException, UnknownHostException {
+    public static JSONObject sendAndReceiveDatagramPacket(DatagramSocket socket, FlightClientController controller, String serverAddress, int serverPortNumber, JSONObject userInput) throws Exception {
         InetAddress serverInetAddress = InetAddress.getByName(serverAddress);
         byte[] responseBytes = new byte[1024];
         DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length);
@@ -290,7 +302,7 @@ public class FlightClient {
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            throw e;
         }
 
         JSONObject processedResponse = new JSONObject();
@@ -298,7 +310,7 @@ public class FlightClient {
             // Process response using FlightClientController object
             processedResponse = controller.processResponse(responsePacket);
         } catch (Exception e) {
-            System.out.println(e);
+            throw e;
         }
 
         return processedResponse;
