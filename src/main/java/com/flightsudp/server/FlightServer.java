@@ -11,6 +11,13 @@ public class FlightServer {
             System.exit(1);
         }
 
+        try {
+            InetAddress local = InetAddress.getLocalHost();
+            System.out.println(local);
+        } catch (Exception e) {
+            //handle error
+        }
+        
         // Parse command line argument
         int portNumber = Integer.parseInt(args[0]);
 
